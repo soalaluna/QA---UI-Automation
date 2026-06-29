@@ -1,92 +1,192 @@
-"""
-Test suite for the Homepage - hayopnimanam.com
-Only tests clickable/interactive elements.
-"""
-
 import pytest
 from playwright.sync_api import Page, expect
-from locators.homepage_locators import HomepageLocators as HL
+from locators.homepage_locators import (
+    BASE_URL,
+    LOGO_HOMEPAGE,
+    NAV_MENU, NAV_ABOUT, NAV_PRESS, NAV_CONTACT, NAV_RESERVATIONS, NAV_ORDER_ONLINE,
+    HERO_HEADING, HERO_MAKE_RESERVATION, HERO_ORDER_ONLINE, HERO_SEE_MENU,
+    IMG_INASAL, IMG_LAND, IMG_EAGLE, IMG_MIDNIGHT_ADOBO,
+    IMG_YELLOW_FLOWER, IMG_TREE_BRANCH, IMG_FISH, IMG_BANANA_TREE,
+    IMG_KALABAW, IMG_HEADLINE, IMG_LANDING_ARTWORK_10_3, IMG_PINK_FLOWER,
+    FOOTER_SOCIALS_ICON, FOOTER_TAGLINE, FOOTER_ADDRESS,
+    FOOTER_PRIVACY, FOOTER_TERMS,
+)
 
-
-# ── Fixtures ──────────────────────────────────────────────────────────────────
 
 @pytest.fixture(autouse=True)
-def navigate_to_homepage(page: Page):
-    page.goto(HL.BASE_URL)
-    yield
+def navigate(page: Page):
+    page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
 
 
-# ── Navigation Tests ──────────────────────────────────────────────────────────
+# ── Logo ──────────────────────────────────────────────────────────────────────
 
-class TestNavigation:
+def test_logo_visible(page: Page):
+    expect(page.locator(LOGO_HOMEPAGE)).to_be_visible()
 
-    def test_nav_menu_navigates(self, page: Page):
-        page.locator(HL.NAV_MENU).click()
-        expect(page).not_to_have_url(HL.BASE_URL)
-
-    def test_nav_about_navigates(self, page: Page):
-        page.locator(HL.NAV_ABOUT).click()
-        expect(page).not_to_have_url(HL.BASE_URL)
-
-    def test_nav_press_navigates(self, page: Page):
-        page.locator(HL.NAV_PRESS).click()
-        expect(page).not_to_have_url(HL.BASE_URL)
-
-    def test_nav_contact_navigates(self, page: Page):
-        page.locator(HL.NAV_CONTACT).click()
-        expect(page).not_to_have_url(HL.BASE_URL)
-
-    def test_nav_reservations_navigates(self, page: Page):
-        page.locator(HL.NAV_RESERVATIONS).click()
-        expect(page).not_to_have_url(HL.BASE_URL)
-
-    def test_nav_order_online_opens_popup(self, page: Page):
-        with page.expect_popup() as popup_info:
-            page.locator(HL.NAV_ORDER_ONLINE).click()
-        popup = popup_info.value
-        assert "atlas.kitchen" in popup.url
-        popup.close()
-
-    def test_nav_homepage_stays_on_homepage(self, page: Page):
-        page.locator(HL.NAV_HOMEPAGE).first.click()
-        expect(page).to_have_url(HL.BASE_URL)
+def test_logo_navigates_to_homepage(page: Page):
+    page.locator(LOGO_HOMEPAGE).click()
+    page.wait_for_load_state("networkidle")
+    assert page.url == BASE_URL, f"Expected homepage, got: {page.url}"
 
 
-# ── Hero / CTA Tests ──────────────────────────────────────────────────────────
+# ── Navigation Visibility ──────────────────────────────────────────────────────
 
-class TestHeroCTAs:
+def test_nav_menu_visible(page: Page):
+    expect(page.locator(NAV_MENU)).to_be_visible()
 
-    def test_make_reservation_navigates(self, page: Page):
-        page.locator(HL.BTN_MAKE_RESERVATION).click()
-        expect(page).not_to_have_url(HL.BASE_URL)
+def test_nav_about_visible(page: Page):
+    expect(page.locator(NAV_ABOUT)).to_be_visible()
 
-    def test_order_online_opens_popup(self, page: Page):
-        with page.expect_popup() as popup_info:
-            page.locator(HL.BTN_ORDER_ONLINE).click()
-        popup = popup_info.value
-        assert "atlas.kitchen" in popup.url
-        popup.close()
+def test_nav_press_visible(page: Page):
+    expect(page.locator(NAV_PRESS)).to_be_visible()
 
-    def test_see_the_menu_navigates(self, page: Page):
-        page.locator(HL.BTN_SEE_THE_MENU).click()
-        expect(page).to_have_url("https://hayopnimanam.com/menu/")
+def test_nav_contact_visible(page: Page):
+    expect(page.locator(NAV_CONTACT)).to_be_visible()
+
+def test_nav_reservations_visible(page: Page):
+    expect(page.locator(NAV_RESERVATIONS)).to_be_visible()
+
+def test_nav_order_online_visible(page: Page):
+    expect(page.locator(NAV_ORDER_ONLINE)).to_be_visible()
 
 
-# ── Footer Tests ──────────────────────────────────────────────────────────────
+# ── Navigation Behavior ────────────────────────────────────────────────────────
 
-class TestFooter:
+def test_nav_menu_navigates(page: Page):
+    page.locator(NAV_MENU).click()
+    page.wait_for_load_state("networkidle")
+    assert "menu" in page.url.lower(), f"Expected menu page, got: {page.url}"
 
-    def test_instagram_opens_popup(self, page: Page):
-        with page.expect_popup() as popup_info:
-            page.locator(HL.FOOTER_INSTAGRAM).click()
-        popup = popup_info.value
-        assert "instagram.com" in popup.url
-        popup.close()
+def test_nav_about_navigates(page: Page):
+    page.locator(NAV_ABOUT).click()
+    page.wait_for_load_state("networkidle")
+    assert "who-we-are" in page.url.lower(), f"Expected about page, got: {page.url}"
 
-    def test_privacy_policy_navigates(self, page: Page):
-        page.locator(HL.FOOTER_PRIVACY).click()
-        expect(page).to_have_url("https://hayopnimanam.com/privacy-policy/")
+def test_nav_press_navigates(page: Page):
+    page.locator(NAV_PRESS).click()
+    page.wait_for_load_state("networkidle")
+    assert "press" in page.url.lower(), f"Expected press page, got: {page.url}"
 
-    def test_terms_conditions_navigates(self, page: Page):
-        page.locator(HL.FOOTER_TERMS).click()
-        expect(page).to_have_url("https://hayopnimanam.com/terms-conditions/")
+def test_nav_contact_navigates(page: Page):
+    page.locator(NAV_CONTACT).click()
+    page.wait_for_load_state("networkidle")
+    assert "contact" in page.url.lower(), f"Expected contact page, got: {page.url}"
+
+def test_nav_reservations_navigates(page: Page):
+    page.locator(NAV_RESERVATIONS).click()
+    page.wait_for_load_state("networkidle")
+    assert "reservation" in page.url.lower(), f"Expected reservation page, got: {page.url}"
+
+def test_nav_order_online_opens_new_tab(page: Page):
+    with page.expect_popup() as popup_info:
+        page.locator(NAV_ORDER_ONLINE).click()
+    popup = popup_info.value
+    popup.wait_for_load_state("domcontentloaded")
+    assert "atlas.kitchen" in popup.url, f"Expected order online site, got: {popup.url}"
+
+
+# ── Hero Section ──────────────────────────────────────────────────────────────
+
+def test_hero_heading_visible(page: Page):
+    expect(page.locator(HERO_HEADING)).to_be_visible()
+
+def test_hero_make_reservation_visible(page: Page):
+    expect(page.locator(HERO_MAKE_RESERVATION)).to_be_visible()
+
+def test_hero_order_online_visible(page: Page):
+    expect(page.locator(HERO_ORDER_ONLINE).first).to_be_visible()
+
+def test_hero_see_menu_visible(page: Page):
+    expect(page.locator(HERO_SEE_MENU)).to_be_visible()
+
+def test_hero_make_reservation_navigates(page: Page):
+    page.locator(HERO_MAKE_RESERVATION).click()
+    page.wait_for_load_state("networkidle")
+    assert "reservation" in page.url.lower(), f"Expected reservation page, got: {page.url}"
+
+def test_hero_order_online_opens_new_tab(page: Page):
+    with page.expect_popup() as popup_info:
+        page.locator(HERO_ORDER_ONLINE).first.click()
+    popup = popup_info.value
+    popup.wait_for_load_state("domcontentloaded")
+    assert "atlas.kitchen" in popup.url, f"Expected order online site, got: {popup.url}"
+
+def test_hero_see_menu_navigates(page: Page):
+    page.locator(HERO_SEE_MENU).click()
+    page.wait_for_load_state("networkidle")
+    assert "menu" in page.url.lower(), f"Expected menu page, got: {page.url}"
+
+
+# ── Hero Decorative Images ────────────────────────────────────────────────────
+
+def test_img_inasal_visible(page: Page):
+    expect(page.locator(IMG_INASAL)).to_be_visible()
+
+def test_img_land_visible(page: Page):
+    expect(page.locator(IMG_LAND).first).to_be_visible()
+
+def test_img_eagle_visible(page: Page):
+    expect(page.locator(IMG_EAGLE)).to_be_visible()
+
+def test_img_midnight_adobo_visible(page: Page):
+    expect(page.locator(IMG_MIDNIGHT_ADOBO)).to_be_visible()
+
+def test_img_yellow_flower_visible(page: Page):
+    expect(page.locator(IMG_YELLOW_FLOWER).first).to_be_visible()
+
+def test_img_tree_branch_visible(page: Page):
+    expect(page.locator(IMG_TREE_BRANCH)).to_be_visible()
+
+def test_img_fish_visible(page: Page):
+    expect(page.locator(IMG_FISH).first).to_be_visible()
+
+def test_img_banana_tree_visible(page: Page):
+    expect(page.locator(IMG_BANANA_TREE)).to_be_visible()
+
+def test_img_kalabaw_visible(page: Page):
+    expect(page.locator(IMG_KALABAW)).to_be_visible()
+
+def test_img_headline_visible(page: Page):
+    expect(page.locator(IMG_HEADLINE)).to_be_visible()
+
+def test_img_landing_artwork_10_3_visible(page: Page):
+    expect(page.locator(IMG_LANDING_ARTWORK_10_3)).to_be_visible()
+
+def test_img_pink_flower_visible(page: Page):
+    expect(page.locator(IMG_PINK_FLOWER)).to_be_visible()
+
+
+# ── Footer ────────────────────────────────────────────────────────────────────
+
+def test_footer_socials_icon_visible(page: Page):
+    expect(page.locator(FOOTER_SOCIALS_ICON)).to_be_visible()
+
+def test_footer_socials_icon_opens_new_tab(page: Page):
+    with page.expect_popup() as popup_info:
+        page.locator(FOOTER_SOCIALS_ICON).click()
+    popup = popup_info.value
+    popup.wait_for_load_state("domcontentloaded")
+    assert "instagram.com" in popup.url, f"Expected Instagram, got: {popup.url}"
+
+def test_footer_tagline_visible(page: Page):
+    expect(page.locator(FOOTER_TAGLINE)).to_be_visible()
+
+def test_footer_address_visible(page: Page):
+    expect(page.locator(FOOTER_ADDRESS)).to_be_visible()
+
+def test_footer_privacy_visible(page: Page):
+    expect(page.locator(FOOTER_PRIVACY)).to_be_visible()
+
+def test_footer_terms_visible(page: Page):
+    expect(page.locator(FOOTER_TERMS)).to_be_visible()
+
+def test_footer_privacy_navigates(page: Page):
+    page.locator(FOOTER_PRIVACY).click()
+    page.wait_for_load_state("networkidle")
+    assert "privacy-policy" in page.url.lower(), f"Expected privacy policy page, got: {page.url}"
+
+def test_footer_terms_navigates(page: Page):
+    page.locator(FOOTER_TERMS).click()
+    page.wait_for_load_state("networkidle")
+    assert "terms-conditions" in page.url.lower(), f"Expected terms page, got: {page.url}"
