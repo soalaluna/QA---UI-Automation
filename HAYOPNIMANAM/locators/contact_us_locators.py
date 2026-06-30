@@ -1,15 +1,24 @@
 class ContactLocators:
-    BASE_URL    = "https://hayopnimanam.com/"
+
+    # --- URLs ---
     CONTACT_URL = "https://hayopnimanam.com/contact-us/"
 
-    # --- Navigation ---
-    NAV_CONTACT         = "nav a:has-text('CONTACT')"
+    # --- Headings ---
+    HEADING_CONTACT_US  = "role=heading[name='contact us']"
+    HEADING_KAMUSTA_KA  = "role=heading[name='kamusta ka na?']"
 
-    # --- Contact Page ---
-    LINK_EMAIL_AMOY     = "a[href='mailto:amoy.street@hayopnimanam.com']"
-    LINK_EMAIL_MOMENT   = "a[href='mailto:momentgroup@hayopnimanam.com']"
+    # --- Address & Phone (display text, not interactive) ---
+    TEXT_ADDRESS = "main >> text=104 Amoy Street, Singapore"
+    TEXT_PHONE   = "text=+65 8028"
 
-    # --- Footer ---
-    FOOTER_INSTAGRAM    = "a[href='https://www.instagram.com/hayop.sg']"
-    FOOTER_PRIVACY      = "a[href='https://hayopnimanam.com/privacy-policy/']"
-    FOOTER_TERMS        = "a[href='https://hayopnimanam.com/terms-conditions/']"
+    # --- Section Labels ---
+    TEXT_INQUIRIES_RESERVATIONS = "text=For Inquiries & Reservations"
+    TEXT_BRAND_BUSINESS         = "text=For Brand & Business"
+
+    # --- Email Links ---
+    LINK_EMAIL_AMOY   = "a[href='mailto:amoy.street@hayopnimanam.com']"
+    LINK_EMAIL_MOMENT = "a[href='mailto:momentgroup@hayopnimanam.com']"
+
+    # --- Decorative Images ---
+    IMG_KALACHUCHI = "role=img[name='Background Image kalachuchi']"
+    IMG_LEAF       = "role=img[name='Background Image Leaf']"

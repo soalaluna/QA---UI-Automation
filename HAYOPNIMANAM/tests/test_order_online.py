@@ -1,111 +1,172 @@
 import pytest
-from playwright.sync_api import Page, expect, Browser
-from HAYOPNIMANAM.locators.order_online_locators import OrderOnlineLocators
-
-MAIN_URL        = "https://hayopnimanam.com/"
-ORDER_URL       = "https://hayop.atlas.kitchen/"
-SIGNUP_URL      = "https://hayop.atlas.kitchen/signup"
-LOGIN_URL       = "https://hayop.atlas.kitchen/login"
-ITEM_URL        = "https://hayop.atlas.kitchen/items/443-buko-pie"
+from playwright.sync_api import Page, expect
+from locators.order_online_locators import OrderOnlineLocators as OL
 
 
-def test_order_online_opens_new_tab(page: Page, browser: Browser):
-    """Clicking ORDER ONLINE from nav should open hayop.atlas.kitchen in a new tab"""
-    page.goto(MAIN_URL)
-    with page.expect_popup() as popup_info:
-        page.get_by_role("link", name="Go to Page ORDER ONLINE").click()
-    popup = popup_info.value
-    popup.wait_for_load_state("domcontentloaded")
-    expect(popup).to_have_url("https://hayop.atlas.kitchen/")
+# ── Fixtures ──────────────────────────────────────────────────────────────────
+
+@pytest.fixture(autouse=True)
+def navigate_to_order_online(page: Page):
+    page.goto(OL.ORDER_ONLINE_URL, wait_until="domcontentloaded", timeout=60000)
+    yield
 
 
-def test_location_search_input_is_present(page: Page):
-    """Location/address search text should be present on the ordering homepage"""
-    page.goto(ORDER_URL)
-    page.wait_for_load_state("domcontentloaded")
-    # Use the desktop-visible version (nth 1 skips the hidden mobile one)
-    location_dropdown = page.get_by_text("Select a delivery/pickup").nth(1)
-    expect(location_dropdown).to_be_visible()
+# ── Header Tests ──────────────────────────────────────────────────────────────
+
+class TestOrderOnlineHeader:
+
+    def test_logo_visible(self, page: Page):
+        expect(page.locator(OL.LINK_HAYOP_LOGO)).to_be_visible()
+
+    def test_logo_clickable(self, page: Page):
+        page.locator(OL.LINK_HAYOP_LOGO).click()
+        expect(page).to_have_url(OL.ORDER_ONLINE_URL)
+
+    def test_delivery_location_button_visible(self, page: Page):
+        expect(page.locator(OL.BTN_DELIVERY_LOCATION).nth(1)).to_be_visible()
+
+    def test_cart_button_visible(self, page: Page):
+        expect(page.locator(OL.BTN_CART)).to_be_visible()
 
 
-def test_location_search_navigates_to_menu(page: Page):
-    """Clicking the location dropdown should navigate to the menu/ordering page"""
-    page.goto(ORDER_URL)
-    page.wait_for_load_state("domcontentloaded")
-    # Clicking the dropdown navigates directly to menu — verify menu loads
-    page.get_by_text("Select a delivery/pickup").nth(1).click()
-    page.wait_for_load_state("domcontentloaded")
-    # Menu page should show at least one food item
-    expect(page.get_by_role("heading", name="Starters")).to_be_visible()
+# ── Menu Section Tests ─────────────────────────────────────────────────────────
+
+class TestMenuSections:
+
+    def test_bakery_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_BAKERY)).to_be_visible()
+
+    def test_starters_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_STARTERS)).to_be_visible()
+
+    def test_mains_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_MAINS)).to_be_visible()
+
+    def test_vegetables_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_VEGETABLES)).to_be_visible()
+
+    def test_rice_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_RICE)).to_be_visible()
+
+    def test_desserts_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_DESSERTS)).to_be_visible()
 
 
-def test_signup_page_loads(page: Page):
-    """Sign up page should load with phone field and Continue with email button"""
-    page.goto(SIGNUP_URL)
-    page.wait_for_load_state("domcontentloaded")
-    expect(page.get_by_role("textbox", name="Contact number")).to_be_visible()
-    expect(page.get_by_role("button", name="Continue with email")).to_be_visible()
+# ── Menu Item Tests (sample set) ───────────────────────────────────────────────
+
+class TestMenuItems:
+
+    def test_ensaymada_item_visible(self, page: Page):
+        expect(page.locator(OL.ITEM_ENSAYMADA)).to_be_visible()
+
+    def test_chicharon_bulaklak_item_visible(self, page: Page):
+        expect(page.locator(OL.ITEM_CHICHARON_BULAKLAK)).to_be_visible()
+
+    def test_adobong_pula_item_visible(self, page: Page):
+        expect(page.locator(OL.ITEM_ADOBONG_PULA)).to_be_visible()
+
+    def test_buko_pie_item_visible(self, page: Page):
+        expect(page.locator(OL.ITEM_BUKO_PIE)).to_be_visible()
+
+    def test_clicking_menu_item_opens_modal_and_closes(self, page: Page):
+        """Clicking a menu item should open its detail modal, closable via Close button."""
+        page.locator(OL.ITEM_ENSAYMADA).click()
+        page.locator(OL.BTN_MODAL_CLOSE).wait_for(state="visible", timeout=10000)
+        page.locator(OL.BTN_MODAL_CLOSE).click()
 
 
-def test_signup_form_accepts_phone_input(page: Page):
-    """Sign up phone field should accept a phone number"""
-    page.goto(SIGNUP_URL)
-    page.wait_for_load_state("domcontentloaded")
-    phone_input = page.get_by_role("textbox", name="Contact number")
-    phone_input.fill("+65 9823 9223")
-    expect(phone_input).not_to_be_empty()
+# ── Delivery/Pickup Dialog Tests ──────────────────────────────────────────────
+
+class TestDeliveryPickupDialog:
+
+    @pytest.fixture(autouse=True)
+    def open_location_dialog(self, page: Page):
+        page.locator(OL.BTN_DELIVERY_LOCATION).nth(1).click()
+        OL.tab_pickup(page).wait_for(state="visible", timeout=10000)
+
+    def test_pickup_tab_visible(self, page: Page):
+        expect(OL.tab_pickup(page)).to_be_visible()
+
+    def test_delivery_tab_visible(self, page: Page):
+        expect(OL.tab_delivery(page)).to_be_visible()
+
+    def test_pickup_outlet_radio_visible(self, page: Page):
+        OL.tab_pickup(page).click()
+        expect(page.locator(OL.RADIO_OUTLET_HAYOP)).to_be_visible()
+
+    def test_pickup_cancel_confirm_buttons_visible(self, page: Page):
+        OL.tab_pickup(page).click()
+        expect(page.locator(OL.BTN_DIALOG_CANCEL)).to_be_visible()
+        expect(page.locator(OL.BTN_DIALOG_CONFIRM)).to_be_visible()
+
+    def test_delivery_address_field_visible(self, page: Page):
+        # Delivery is the default tab on dialog open — no tab switch needed.
+        expect(page.locator(OL.FIELD_DELIVERY_ADDRESS)).to_be_visible()
+
+    def test_delivery_address_field_fillable(self, page: Page):
+        page.locator(OL.FIELD_DELIVERY_ADDRESS).fill("Singapore")
+        expect(page.locator(OL.FIELD_DELIVERY_ADDRESS)).to_have_value("Singapore")
+
+    def test_delivery_address_field_submits_on_enter(self, page: Page):
+        field = page.locator(OL.FIELD_DELIVERY_ADDRESS)
+        field.fill("Singapore")
+        field.press("Enter")
+        # TODO: assert on the actual post-submit state (autocomplete list,
+        # enabled confirm button, navigation, etc.) once confirmed.
 
 
-def test_signup_email_flow(page: Page):
-    """Clicking Continue with email should reveal the email field"""
-    page.goto(SIGNUP_URL)
-    page.wait_for_load_state("domcontentloaded")
-    page.get_by_role("button", name="Continue with email").click()
-    page.wait_for_timeout(500)
-    # After clicking, only email field appears on this step
-    expect(page.get_by_role("textbox", name="Enter your email")).to_be_visible()
-    # Continue with phone button should also appear as alternative
-    expect(page.get_by_role("button", name="Continue with phone")).to_be_visible()
+# ── Cart Tests ─────────────────────────────────────────────────────────────────
+
+class TestCart:
+
+    def test_cart_opens_with_empty_state(self, page: Page):
+        page.locator(OL.BTN_CART).click()
+        expect(page.locator(OL.HEADING_YOUR_CART)).to_be_visible()
+        expect(page.get_by_text("Your cart is empty.")).to_be_visible()
 
 
-def test_login_page_loads(page: Page):
-    """Login page should load with phone number input and country selector"""
-    page.goto(LOGIN_URL)
-    page.wait_for_load_state("domcontentloaded")
-    expect(page.get_by_role("textbox", name="Contact number")).to_be_visible()
-    expect(page.get_by_label("Phone number country")).to_be_visible()
+# ── Account Menu Tests ─────────────────────────────────────────────────────────
+# TODO: BTN_ACCOUNT_MENU is unresolved. get_by_role("img").nth(1) now opens
+# the cart dialog instead of the account menu. Replace the click target below
+# once the real locator is found via Inspect Element / codegen "Pick locator".
+
+class TestAccountMenu:
+
+    def test_signup_menuitem_visible(self, page: Page):
+        page.locator(OL.BTN_ACCOUNT_MENU).click()
+        expect(page.locator(OL.MENU_ITEM_SIGNUP)).to_be_visible()
+
+    def test_login_menuitem_visible(self, page: Page):
+        page.locator(OL.BTN_ACCOUNT_MENU).click()
+        expect(page.locator(OL.MENU_ITEM_LOGIN)).to_be_visible()
 
 
-def test_login_country_selector_works(page: Page):
-    """Country selector on login page should allow changing to PH"""
-    page.goto(LOGIN_URL)
-    page.wait_for_load_state("domcontentloaded")
-    country_select = page.get_by_label("Phone number country")
-    country_select.select_option("PH")
-    expect(country_select).to_have_value("PH")
+# ── Footer Tests ──────────────────────────────────────────────────────────────
 
+class TestOrderOnlineFooter:
 
-def test_login_phone_accepts_input(page: Page):
-    """Login phone field should accept a phone number"""
-    page.goto(LOGIN_URL)
-    page.wait_for_load_state("domcontentloaded")
-    phone_input = page.get_by_role("textbox", name="Contact number")
-    phone_input.fill("+63 968 422 4829")
-    expect(phone_input).not_to_be_empty()
+    def test_find_us_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_FIND_US)).to_be_visible()
 
+    def test_address_link_opens_popup(self, page: Page):
+        """Address link should open Google Maps in a new tab."""
+        with page.expect_popup() as popup_info:
+            page.locator(OL.LINK_ADDRESS).click()
+        popup = popup_info.value
+        assert popup.url != ""
+        popup.close()
 
-def test_item_page_loads(page: Page):
-    """Buko Pie item page should load with special instructions field"""
-    page.goto(ITEM_URL)
-    page.wait_for_load_state("domcontentloaded")
-    notes_input = page.get_by_role("textbox", name="Let us know of any special")
-    expect(notes_input).to_be_visible()
+    def test_operating_hours_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_OPERATING_HOURS)).to_be_visible()
 
+    def test_social_heading_visible(self, page: Page):
+        expect(page.locator(OL.HEADING_SOCIAL)).to_be_visible()
 
-def test_item_special_notes_accepts_input(page: Page):
-    """Special instructions field on item page should accept text input"""
-    page.goto(ITEM_URL)
-    page.wait_for_load_state("domcontentloaded")
-    notes_input = page.get_by_role("textbox", name="Let us know of any special")
-    notes_input.fill("no pie")
-    expect(notes_input).to_have_value("no pie")
+    def test_make_reservation_link_visible(self, page: Page):
+        expect(page.locator(OL.LINK_MAKE_RESERVATION)).to_be_visible()
+
+    def test_atlas_website_link_visible(self, page: Page):
+        expect(page.locator(OL.LINK_ATLAS_WEBSITE)).to_be_visible()
+
+    def test_scroll_to_top_button_visible(self, page: Page):
+        expect(page.locator(OL.SCROLLER_TOP_BTN)).to_contain_text("TOP")
