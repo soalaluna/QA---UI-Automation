@@ -1,93 +1,131 @@
 import pytest
 from playwright.sync_api import Page, expect
 from locators.communications_locators import (
-    BASE_URL, COMMUNICATIONS_URL,
-    NAV_COMMUNICATIONS,
-    EMAIL_JOINUS, EMAIL_PARTNER, EMAIL_PRESS, EMAIL_SCM, EMAIL_EVENTS,
+    BASE_URL,
+    HEADING_SAY_HELLO, HEADING_HEADQUARTERS, HEADING_EMAIL_ADDRESS,
+    HEADING_PHONE, HEADING_SPEAK_FREELY,
+    TEXT_MOPLEX, TEXT_ADDRESS,
+    TEXT_JOB_INQUIRIES, TEXT_BUSINESS_INQUIRIES, TEXT_PRESS_INQUIRIES,
+    TEXT_PRODUCT_INQUIRIES, TEXT_EVENTS_INQUIRIES,
+    LINK_JOINUS, LINK_PARTNER, LINK_PRESS, LINK_SCM, LINK_EVENTS,
+    LINK_LANDLINE, LINK_FAX,
+    TEXT_SPEAK_FREELY,
 )
 
 
-# ── Nav to Communications ─────────────────────────────────────────────────────
-
-def test_communications_nav_link_visible(page: Page):
-    """Communications link should be visible in the navigation"""
+@pytest.fixture(autouse=True)
+def navigate(page: Page):
     page.goto(BASE_URL)
-    expect(page.locator(NAV_COMMUNICATIONS)).to_be_visible()
-
-def test_communications_nav_link_navigates(page: Page):
-    """Clicking Communications nav link should navigate to the communications page"""
-    page.goto(BASE_URL)
-    page.locator(NAV_COMMUNICATIONS).click()
     page.wait_for_load_state("networkidle")
-    expect(page).to_have_url(COMMUNICATIONS_URL)
 
 
-# ── Email Links Visible ───────────────────────────────────────────────────────
+# ── Page Headings ──────────────────────────────────────────────────────────────
 
-def test_email_joinus_visible(page: Page):
-    """joinus@momentgroup.ph email link should be visible"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    expect(page.locator(EMAIL_JOINUS)).to_be_visible()
+def test_heading_say_hello_visible(page: Page):
+    expect(page.locator(HEADING_SAY_HELLO)).to_be_visible()
 
-def test_email_partner_visible(page: Page):
-    """partnerwithus@momentgroup.ph email link should be visible"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    expect(page.locator(EMAIL_PARTNER)).to_be_visible()
+def test_heading_headquarters_visible(page: Page):
+    expect(page.locator(HEADING_HEADQUARTERS)).to_be_visible()
 
-def test_email_press_visible(page: Page):
-    """press@momentgroup.ph email link should be visible"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    expect(page.locator(EMAIL_PRESS)).to_be_visible()
+def test_heading_email_address_visible(page: Page):
+    expect(page.locator(HEADING_EMAIL_ADDRESS)).to_be_visible()
 
-def test_email_scm_visible(page: Page):
-    """scm.sourcing@momentgroup.ph email link should be visible"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    expect(page.locator(EMAIL_SCM)).to_be_visible()
+def test_heading_phone_visible(page: Page):
+    expect(page.locator(HEADING_PHONE)).to_be_visible()
 
-def test_email_events_visible(page: Page):
-    """events@momentgroup.ph email link should be visible"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    expect(page.locator(EMAIL_EVENTS)).to_be_visible()
+def test_heading_speak_freely_visible(page: Page):
+    expect(page.locator(HEADING_SPEAK_FREELY)).to_be_visible()
 
 
-# ── Email Links href Checks ───────────────────────────────────────────────────
+# ── Headquarters ───────────────────────────────────────────────────────────────
 
-def test_email_joinus_href(page: Page):
-    """joinus link should have correct mailto href"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    href = page.locator(EMAIL_JOINUS).get_attribute("href")
+def test_text_moplex_visible(page: Page):
+    expect(page.locator(TEXT_MOPLEX)).to_be_visible()
+
+def test_text_address_visible(page: Page):
+    expect(page.locator(TEXT_ADDRESS)).to_be_visible()
+
+
+# ── Email Inquiry Labels ───────────────────────────────────────────────────────
+
+def test_text_job_inquiries_visible(page: Page):
+    expect(page.locator(TEXT_JOB_INQUIRIES)).to_be_visible()
+
+def test_text_business_inquiries_visible(page: Page):
+    expect(page.locator(TEXT_BUSINESS_INQUIRIES)).to_be_visible()
+
+def test_text_press_inquiries_visible(page: Page):
+    expect(page.locator(TEXT_PRESS_INQUIRIES)).to_be_visible()
+
+def test_text_product_inquiries_visible(page: Page):
+    expect(page.locator(TEXT_PRODUCT_INQUIRIES)).to_be_visible()
+
+def test_text_events_inquiries_visible(page: Page):
+    expect(page.locator(TEXT_EVENTS_INQUIRIES)).to_be_visible()
+
+
+# ── Email Links Visible ────────────────────────────────────────────────────────
+
+def test_link_joinus_visible(page: Page):
+    expect(page.locator(LINK_JOINUS)).to_be_visible()
+
+def test_link_partner_visible(page: Page):
+    expect(page.locator(LINK_PARTNER)).to_be_visible()
+
+def test_link_press_visible(page: Page):
+    expect(page.locator(LINK_PRESS)).to_be_visible()
+
+def test_link_scm_visible(page: Page):
+    expect(page.locator(LINK_SCM)).to_be_visible()
+
+def test_link_events_visible(page: Page):
+    expect(page.locator(LINK_EVENTS)).to_be_visible()
+
+
+# ── Email Links href Checks ────────────────────────────────────────────────────
+
+def test_link_joinus_href(page: Page):
+    href = page.locator(LINK_JOINUS).get_attribute("href")
     assert "joinus@momentgroup.ph" in href, f"Unexpected href: {href}"
 
-def test_email_partner_href(page: Page):
-    """partnerwithus link should have correct mailto href"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    href = page.locator(EMAIL_PARTNER).get_attribute("href")
+def test_link_partner_href(page: Page):
+    href = page.locator(LINK_PARTNER).get_attribute("href")
     assert "partnerwithus@momentgroup.ph" in href, f"Unexpected href: {href}"
 
-def test_email_press_href(page: Page):
-    """press link should have correct mailto href"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    href = page.locator(EMAIL_PRESS).get_attribute("href")
+def test_link_press_href(page: Page):
+    href = page.locator(LINK_PRESS).get_attribute("href")
     assert "press@momentgroup.ph" in href, f"Unexpected href: {href}"
 
-def test_email_scm_href(page: Page):
-    """scm.sourcing link should have correct mailto href"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    href = page.locator(EMAIL_SCM).get_attribute("href")
+def test_link_scm_href(page: Page):
+    href = page.locator(LINK_SCM).get_attribute("href")
     assert "scm.sourcing@momentgroup.ph" in href, f"Unexpected href: {href}"
 
-def test_email_events_href(page: Page):
-    """events link should have correct mailto href"""
-    page.goto(COMMUNICATIONS_URL)
-    page.wait_for_load_state("networkidle")
-    href = page.locator(EMAIL_EVENTS).get_attribute("href")
+def test_link_events_href(page: Page):
+    href = page.locator(LINK_EVENTS).get_attribute("href")
     assert "events@momentgroup.ph" in href, f"Unexpected href: {href}"
+
+
+# ── Phone Links Visible ────────────────────────────────────────────────────────
+
+def test_link_landline_visible(page: Page):
+    expect(page.locator(LINK_LANDLINE)).to_be_visible()
+
+def test_link_fax_visible(page: Page):
+    expect(page.locator(LINK_FAX)).to_be_visible()
+
+
+# ── Phone Links href Checks ────────────────────────────────────────────────────
+
+def test_link_landline_href(page: Page):
+    href = page.locator(LINK_LANDLINE).get_attribute("href")
+    assert "tel:" in href, f"Expected tel: href, got: {href}"
+
+def test_link_fax_href(page: Page):
+    href = page.locator(LINK_FAX).get_attribute("href")
+    assert "tel:" in href or "fax:" in href, f"Unexpected href: {href}"
+
+
+# ── Speak Freely Section ───────────────────────────────────────────────────────
+
+def test_text_speak_freely_visible(page: Page):
+    expect(page.locator(TEXT_SPEAK_FREELY)).to_be_visible()

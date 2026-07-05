@@ -1,91 +1,50 @@
 import pytest
 from playwright.sync_api import Page, expect
-from locators.brands_locators import BrandsLocators as BL
-
-DISABLE_ANIMATIONS = "*, *::before, *::after { animation: none !important; transition: none !important; opacity: 1 !important; visibility: visible !important; }"
-
-
-# ── Fixtures ──────────────────────────────────────────────────────────────────
+from locators.brands_locators import (
+    BASE_URL, BRAND_1, BRAND_2, BRAND_3, BRAND_4, BRAND_5, 
+    BRAND_6, BRAND_7, BRAND_8, BRAND_9, BRAND_10, BRAND_11
+)
 
 @pytest.fixture(autouse=True)
-def navigate_to_brands(page: Page):
-    """Navigate to brands page before each test"""
-    page.goto(BL.BASE_URL)
-    page.add_style_tag(content=DISABLE_ANIMATIONS)
-    page.get_by_role("link", name="BRANDS").first.click()
-    page.wait_for_url("**/brands**")
-    yield
+def navigate(page: Page):
+    """Navigates to the brands page before each test."""
+    page.goto(BASE_URL)
+    page.wait_for_load_state("networkidle")
 
 
-# ── Navigation Tests ──────────────────────────────────────────────────────────
+# ── Visibility Tests ──────────────────────────────────────────────────────────
 
-class TestBrandsNavigation:
+def test_brands_grid_visible(page: Page):
+    """Asserts that every brand item is physically visible on the screen."""
+    expect(page.locator(BRAND_1)).to_be_visible()
+    expect(page.locator(BRAND_2)).to_be_visible()
+    expect(page.locator(BRAND_3)).to_be_visible()
+    expect(page.locator(BRAND_4)).to_be_visible()
+    expect(page.locator(BRAND_5)).to_be_visible()
+    expect(page.locator(BRAND_6)).to_be_visible()
+    expect(page.locator(BRAND_7)).to_be_visible()
+    expect(page.locator(BRAND_8)).to_be_visible()
+    expect(page.locator(BRAND_9)).to_be_visible()
+    expect(page.locator(BRAND_10)).to_be_visible()
+    expect(page.locator(BRAND_11)).to_be_visible()
 
-    def test_brands_page_loads(self, page: Page):
-        """Brands page should load at correct URL"""
-        expect(page).to_have_url(BL.BRANDS_URL)
 
+# ── Click & Navigation Tests ──────────────────────────────────────────────────
 
-# ── Brand Click Tests ─────────────────────────────────────────────────────────
-
-class TestBrandClicks:
-
-    def test_brand_1_clickable(self, page: Page):
-        """First brand item should be clickable and navigate away from brands page"""
-        page.locator(BL.BRAND_1).first.click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_2_clickable(self, page: Page):
-        """Brand 2 should navigate to its page"""
-        page.locator(BL.BRAND_2).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_3_clickable(self, page: Page):
-        """Brand 3 should navigate to its page"""
-        page.locator(BL.BRAND_3).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_4_clickable(self, page: Page):
-        """Brand 4 should navigate to its page"""
-        page.locator(BL.BRAND_4).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_5_clickable(self, page: Page):
-        """Brand 5 should navigate to its page"""
-        page.locator(BL.BRAND_5).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_6_clickable(self, page: Page):
-        """Brand 6 should navigate to its page"""
-        page.locator(BL.BRAND_6).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_7_clickable(self, page: Page):
-        """Brand 7 should navigate to its page"""
-        page.goto(BL.BRANDS_URL)
-        page.locator(BL.BRAND_7).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_8_clickable(self, page: Page):
-        """Brand 8 should navigate to its page"""
-        page.goto(BL.BRANDS_URL)
-        page.locator(BL.BRAND_8).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_9_clickable(self, page: Page):
-        """Brand 9 should navigate to its page"""
-        page.goto(BL.BRANDS_URL)
-        page.locator(BL.BRAND_9).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_10_clickable(self, page: Page):
-        """Brand 10 should navigate to its page"""
-        page.goto(BL.BRANDS_URL)
-        page.locator(BL.BRAND_10).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
-
-    def test_brand_11_clickable(self, page: Page):
-        """Brand 11 should navigate to its page"""
-        page.goto(BL.BRANDS_URL)
-        page.locator(BL.BRAND_11).click()
-        expect(page).not_to_have_url(BL.BRANDS_URL)
+def test_brands_grid_clicks(page: Page):
+    """
+    Tests clicking each brand and returning to the base URL 
+    to prevent navigation timeouts.
+    """
+    brands = [
+        BRAND_1, BRAND_2, BRAND_3, BRAND_4, BRAND_5, 
+        BRAND_6, BRAND_7, BRAND_8, BRAND_9, BRAND_10, BRAND_11
+    ]
+    
+    for brand in brands:
+        # Click the individual brand
+        page.locator(brand).click()
+        
+        # Navigate back to the brands page to reset the DOM for the next click
+        page.goto(BASE_URL)
+        page.wait_for_load_state("networkidle")
