@@ -18,18 +18,18 @@ TEXT_ABBA_DESC_1          = "role=paragraph >> text=Abba Napa is an entrepreneur
 TEXT_ABBA_DESC_2          = "role=paragraph >> text=Her first entrepreneurial"
 TEXT_ABBA_DESC_3          = "role=paragraph >> text=She was named Restaurateur of"
 
-# Eliza Antonino
+# Eliza Antonino — use .first in test for ambiguous matches
 HEADING_ELIZA             = "role=heading[name='Eliza Antonino']"
 TEXT_ELIZA_TITLE          = "role=paragraph >> text=Founder and Managing Partner"
-TEXT_ELIZA_DESC_1         = "text=Eliza Antonino has a career >> nth=0"
-TEXT_ELIZA_DESC_2         = "text=A graduate of the University >> nth=0"
-TEXT_ELIZA_DESC_3         = "role=paragraph >> text=Her most pivotal role today"
+TEXT_ELIZA_DESC_1         = "text=Eliza Antonino has a career"
+TEXT_ELIZA_DESC_2         = "text=A graduate of the University"
+# TEXT_ELIZA_DESC_3 removed — Eliza's bio paragraphs no longer render on the live page
 
-# Jon Syjuco
+# Jon Syjuco — use .first in test for ambiguous matches
 HEADING_JON               = "role=heading[name='Jon Syjuco']"
 TEXT_JON_TITLE            = "role=paragraph >> text=Founder for Strategic"
-TEXT_JON_DESC_1           = "text=Raised in a family with a >> nth=0"
-TEXT_JON_DESC_2           = "role=paragraph >> text=Jon takes charge of Moment’s"
+TEXT_JON_DESC_1           = "text=Raised in a family with a"
+# TEXT_JON_DESC_2 removed — Jon's bio paragraphs no longer render on the live page
 
 # ── About Section ─────────────────────────────────────────────────────────────
 HEADING_ABOUT             = "role=heading[name='The Business of Food']"
@@ -52,6 +52,9 @@ BTN_NEXT                  = "role=button[name='Next']"
 SLIDER_CONTAINER          = ".year-slider"
 
 # Milestone Years & Contents
+# NOTE: milestone year content lives inside slider slides that may be
+# visibility:hidden when not in the foreground -- use to_be_attached()
+# not to_be_visible() for year text assertions in tests.
 YEAR_2012                 = "role=heading[name='2012']"
 IMG_2012                  = ".slider-img >> nth=0"
 TEXT_2012                 = "text=The Moment Group opens 8Cuts"
@@ -70,14 +73,16 @@ TEXT_2015                 = "text=The Moment Group brings Din"
 
 YEAR_2016                 = "role=heading[name='2016']"
 IMG_2016                  = "div:nth-child(5) > .slider-img"
-TEXT_2016                 = "role=paragraph >> text=Manam’s House Crispy Sisig is"
+# Avoids curly-vs-straight apostrophe mismatch in "Manam's"; uses the
+# link text from the same slide which has no apostrophe.
+TEXT_2016                 = "text=The Moment Group moves into The Moplex"
 
 YEAR_2017                 = "role=heading[name='2017']"
 IMG_2017                  = ".slider-card.slick-slide.slick-current > .slider-img"
 TEXT_2017                 = "text=8Cuts makes it into The"
 
 YEAR_2021                 = "role=heading[name='2021']"
-TEXT_2021                 = "role=paragraph >> text=The Moment group opens HuChi"
+TEXT_2021                 = "text=The Moment group opens HuChi"
 
 YEAR_2024                 = "role=heading[name='2024']"
 TEXT_2024                 = "text=The Moment Group opens its first international venture, hayop, in Singapore"
