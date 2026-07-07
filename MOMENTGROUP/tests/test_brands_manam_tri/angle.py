@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-from locators.manam_triangle_locators import (
+from MOMENTGROUP.locators.brands_manam_triangle_locators import (
     BASE_URL,
     IMG_BRAND,
     TEXT_ABOUT, HEADING_MUST_TRIES, TEXT_MUST_TRIES,
