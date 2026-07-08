@@ -1,29 +1,34 @@
-BASE_URL        = "https://www.pldtglobal.com/en"
-CONSUMER_URL    = "https://www.pldtglobal.com/en/consumer"
-EPADALA_URL     = "https://www.pldtglobal.com/en/consumer/ePadala"
-TINBO_URL       = "https://www.pldtglobal.com/en/consumer/tinbo"
+class ConsumerLocators:
 
-# ── Cookie Banner ─────────────────────────────────────────────────────────────
-BTN_ACCEPT_COOKIES      = "role=button[name='Accept All Cookies']"
+    URL = "https://www.pldtglobal.com/en/consumer"
 
-# ── Consumer Solutions Heading (homepage, leads to Learn More) ───────────────
-CONSUMER_HEADING         = "role=heading[name='Consumer'][level=3]"
+    # --- Hero Section ---
+    IMG_HERO            = "role=img[name*='Everyday Digital Solutions']"
+    HEADING_SUB         = "role=heading[name=/^consumer$/i]"
+    HEADING_MAIN        = "role=heading[name*='Digital Services for']"
+    TEXT_HERO_DESC      = "text=Simple, secure, and"
 
-# ── Consumer Page - Learn More Links ──────────────────────────────────────────
-LEARN_MORE               = "role=link[name='Learn More']"
+    # --- Solutions Grid ---
+    HEADING_GRID        = "role=heading[name=/^Solutions for Global Filipinos$/]"
+    TEXT_GRID_DESC      = "text=Digital services designed to"
+    BTN_LEARN_MORE      = "role=link[name='Learn More']"
 
-# ── ePadala Sub-page ──────────────────────────────────────────────────────────
-EPADALA_HEADING          = "role=heading[name='ePadala'][level=1]"
+    SOLUTIONS = {
+        "ePadala": {
+            "heading": "role=heading[name='ePadala']",
+            "desc": "text=ePadala is a service that"
+        },
+        "Smart Virtual Number": {
+            "heading": "role=heading[name='Smart Virtual Number']",
+            "desc": "text=Smart Virtual Number (SVN) is"
+        },
+        "TinBo": {
+            "heading": "role=heading[name='TinBo']",
+            "desc": "text=Your one-stop digital shop"
+        }
+    }
 
-# ── TinBo Sub-page ────────────────────────────────────────────────────────────
-LINK_VISIT_TINBO         = "role=link[name='Visit TinBo']"
-
-# ── TinBo FAQ Accordion ───────────────────────────────────────────────────────
-FAQ_WHAT_IS_TINBO        = "role=button[name='What is TinBo?']"
-FAQ_WHO_CAN_USE          = "role=button[name='Who can use TinBo?']"
-FAQ_HOW_GET_PHILIPPINE   = "role=button[name='How do I get a Philippine virtual number?']"
-FAQ_TRANSACTIONS_SECURE  = "role=button[name='Are my transactions secure?']"
-FAQ_COUNTRIES_SUPPORTED  = "role=button[name='Which countries are supported?']"
-
-# ── Explore Link (TinBo page) ─────────────────────────────────────────────────
-LINK_EXPLORE             = "role=link[name='Explore']"
+    # --- Bottom CTA Section ---
+    HEADING_CTA         = "role=heading[name='Reach Out and Stay Connected']"
+    TEXT_CTA_DESC       = "text=Have questions or need"
+    BTN_INQUIRY         = "role=link[name='Send an Inquiry']"
