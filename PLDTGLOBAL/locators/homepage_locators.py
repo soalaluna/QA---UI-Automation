@@ -36,7 +36,7 @@ LEARN_MORE                  = "role=link[name='Learn More']"
 BTN_MORE_NEWS               = "role=link[name='More News']"
 BTN_NEWS_ARTICLE_1          = "role=button[name='Read more article: PLDT Global Joins Community Effort to Support Migrant Workers in Hong Kong']"
 BTN_NEWS_ARTICLE_2          = "role=button[name='Read more article: PLDT Global builds the growth rails connecting brands to the overseas Filipino market']"
-BTN_NEWS_ARTICLE_3          = "role=button[name=\"Read more article: Insights, Connections, & Exciting Opportunities at Sync City '26\"]"
+BTN_NEWS_ARTICLE_3 = "role=button[name=/^Read more article:/i] >> nth=2"
 SHARE_FACEBOOK              = "role=link[name='Share on Facebook']"
 SHARE_LINKEDIN              = "role=link[name='Share on Linkedin']"
 
