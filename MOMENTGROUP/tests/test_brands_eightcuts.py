@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-from locators.eightcuts_locators import EightCutsLocators as EC
+from locators.brands_eightcuts_locators import EightCutsLocators as EC
 
 DISABLE_ANIMATIONS = "*, *::before, *::after { animation: none !important; transition: none !important; opacity: 1 !important; visibility: visible !important; }"
 

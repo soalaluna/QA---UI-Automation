@@ -100,9 +100,10 @@ class MCLocators:
     }
 
     # --- Gallery ---
-    HEADING_GALLERY      = "role=heading[name=/^Gallery$/]" # Fixed exact match error
+    HEADING_GALLERY      = "role=heading[name='Gallery']"
     GALLERY_IMG_FIRST    = ".selectedbrand_img >> nth=0"
     GALLERY_PAGINATION   = "text=12345"
     # Mo' Cookies has 5 pagination dots (0 to 4)
-    SLIDES               = [f"#slick-slide0{i}" for i in range(5)]
+    GALLERY_SLIDES       = ".slick-slide:not(.slick-cloned)"
+    SLIDE_DOTS = "ul.slick-dots li" 
     GALLERY_IMGS         = [f"div:nth-child({i}) > .selectedbrand_img" for i in range(2, 7)]

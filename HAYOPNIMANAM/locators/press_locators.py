@@ -22,12 +22,24 @@ class PressPage:
         self.page.wait_for_url("**/press/**")
 
     def goto_pagination_page(self, page_number: int) -> None:
-        """Click through pagination buttons to reach the given page number."""
+        """Click through pagination buttons to reach the given page number.
+
+        Waits for network activity to settle after each click instead of a
+        fixed timeout. Paginated content here is re-rendered async (no full
+        page navigation), so a fixed 300ms delay could race a later click
+        against an in-progress render when jumping multiple pages ahead
+        (e.g. straight to page 3+), causing intermediate clicks to land on
+        stale content or get swallowed.
+        """
         if page_number == 1:
             return
         for n in range(2, page_number + 1):
             self.page.get_by_role("button", name=str(n)).click()
-            self.page.wait_for_timeout(300)
+            try:
+                self.page.wait_for_load_state("networkidle", timeout=5000)
+            except Exception:
+                pass  # some sites never fully idle (analytics/polling) — non-fatal
+            self.page.wait_for_timeout(300)  # small buffer for any final paint
 
     def link(self, name: str) -> Locator:
         """Return a press article link by partial text match against its card content."""

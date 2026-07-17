@@ -1,3 +1,4 @@
+import re
 import pytest
 from playwright.sync_api import Page, expect
 from locators.newsinsights_locators import NewsInsightsLocators as NI
@@ -60,21 +61,29 @@ class TestArticleInteractions:
         expect(page).not_to_have_url(NI.URL)
 
     def test_share_on_facebook_popup(self, page: Page):
+        """
+        Uses no_wait_after=True + URL-pattern check instead of
+        popup.wait_for_load_state(). The click itself was hanging on
+        "waiting for scheduled navigations to finish" — something about
+        this site's click handling keeps Playwright waiting on a same-tab
+        navigation that never resolves, even though the link opens a new
+        tab (target="_blank"). We only need the popup's URL, not for the
+        main tab's navigation-wait or the popup's full load to complete.
+        """
         with page.expect_popup() as popup_info:
-            page.locator(NI.BTN_SHARE_FB).click()
-        
+            page.locator(NI.BTN_SHARE_FB).click(no_wait_after=True)
+
         popup = popup_info.value
-        popup.wait_for_load_state()
-        assert "facebook.com" in popup.url
+        expect(popup).to_have_url(re.compile(r"facebook\.com"), timeout=10000)
         popup.close()
 
     def test_share_on_linkedin_popup(self, page: Page):
+        """See test_share_on_facebook_popup docstring — same fix applied."""
         with page.expect_popup() as popup_info:
-            page.locator(NI.BTN_SHARE_LI).click()
-        
+            page.locator(NI.BTN_SHARE_LI).click(no_wait_after=True)
+
         popup = popup_info.value
-        popup.wait_for_load_state()
-        assert "linkedin.com" in popup.url
+        expect(popup).to_have_url(re.compile(r"linkedin\.com"), timeout=10000)
         popup.close()
 
 

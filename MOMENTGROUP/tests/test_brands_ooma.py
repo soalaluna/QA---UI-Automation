@@ -111,6 +111,10 @@ class TestLocationsHours:
         expect(page.locator(OC.BRANCH_COMBOBOX)).to_be_visible()
 
     def test_map_container_visible(self, page: Page):
+        # The map container doesn't render until a branch is actually
+        # selected/clicked — it's not present on initial load even though
+        # SM City Cebu shows as pre-selected in the combobox.
+        OC.heading_sm_cebu_first(page).click()
         expect(page.locator(OC.MAP_CONTAINER)).to_be_visible()
 
     # SM City Cebu (default branch)
@@ -118,6 +122,12 @@ class TestLocationsHours:
         expect(OC.heading_sm_cebu_first(page)).to_be_visible()
 
     def test_sm_cebu_details_visible(self, page: Page):
+        # Even though SM City Cebu is pre-selected in the combobox, its
+        # detail section (the second "SM City Cebu" heading, .nth(1)) does
+        # not render until the sidebar heading is clicked — same as every
+        # other branch below. Missing this click was why heading_sm_cebu_detail
+        # (.nth(1)) never found a second match.
+        OC.heading_sm_cebu_first(page).click()
         expect(OC.heading_sm_cebu_detail(page)).to_be_visible()
         expect(page.locator(OC.LINK_SM_CEBU_ADDRESS)).to_be_visible()
         expect(page.locator(OC.LINK_SM_CEBU_PHONE)).to_be_visible()

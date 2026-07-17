@@ -134,8 +134,15 @@ class TestLocationMap:
 
     @pytest.fixture(autouse=True)
     def open_connect_section(self, page: Page):
-        page.locator(AL.LINK_LETS_CONNECT).click()
-        page.wait_for_timeout(500)
+        # "Let's Connect" is a real navigation link to a separate Contact Us
+        # page (confirmed: <a href="https://www.pldtglobal.com/contact-us">)
+        # and is unrelated to this map. The Zoom in / Zoom out / Reset view /
+        # UK location controls, and the Enterprise/Consumer/Carrier filters,
+        # all belong to the "Global Reach, Seamless Connections" map section
+        # that's already present directly on the About page — no click or
+        # navigation needed. Scroll it into view instead.
+        page.locator(AL.BTN_ZOOM_IN).scroll_into_view_if_needed()
+        page.locator(AL.BTN_ZOOM_IN).wait_for(state="visible", timeout=20000)
 
     def test_uk_location_button_clickable(self, page: Page):
         page.locator(AL.BTN_UK_LOCATION).click()
@@ -150,6 +157,12 @@ class TestLocationMap:
         expect(page.locator(AL.BTN_ZOOM_OUT)).to_be_visible()
 
     def test_reset_view_clickable(self, page: Page):
+        # Clicking "Zoom in" triggers a re-render of the map control cluster
+        # (the whole button group remounts), which can detach "Reset view"
+        # mid-click if we chase a stale locator immediately after. Give the
+        # map a moment to settle, then re-query fresh before clicking.
         page.locator(AL.BTN_ZOOM_IN).click()
+        page.wait_for_timeout(800)
+        page.locator(AL.BTN_RESET_VIEW).wait_for(state="visible", timeout=10000)
         page.locator(AL.BTN_RESET_VIEW).click()
         expect(page.locator(AL.BTN_RESET_VIEW)).to_be_visible()

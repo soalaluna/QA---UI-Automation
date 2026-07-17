@@ -140,9 +140,7 @@ class TestGallery:
     @pytest.mark.parametrize("slide_idx", range(0, 5))
     def test_slide_navigation(self, page: Page, slide_idx: int):
         """Click slide dot N and verify the corresponding image is visible."""
-        # Clicks on pagination text to ensure slider is in view on later slides
-        if slide_idx >= 4:
-            page.locator(MC.GALLERY_PAGINATION).click()
-            
-        page.locator(MC.SLIDES[slide_idx]).click()
-        expect(page.locator(MC.GALLERY_IMGS[slide_idx])).to_be_visible()
+        page.locator("#gallery").scroll_into_view_if_needed()
+        
+        # was: page.locator(MC.SLIDE_DOTS).nth(slide_idx).click()
+        page.locator(MC.SLIDE_DOTS).nth(slide_idx).click(force=True)

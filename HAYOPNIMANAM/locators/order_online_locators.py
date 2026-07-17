@@ -27,20 +27,25 @@ class OrderOnlineLocators:
     BTN_ITEM_ADD    = "[data-testid='Ensaymada-menu-item'] >> [data-testid='button']"
 
     # --- Delivery/Pickup Dialog ---
-    # get_by_text("Pickup")/"Delivery" without exact=True substring-matches
-    # the responsive "Select a delivery/pickup location" duplicates (mobile/
-    # tablet/desktop render simultaneously, hidden via CSS) -> strict mode
-    # violation / flaky timing. exact=True isolates the real tab element.
+    # Tabs are targeted via their stable DOM IDs (#pickup / #delivery) rather
+    # than text matching — the site renders both tabs as plain <a> elements
+    # inside the same nav, and ID selectors avoid any risk of duplicate/
+    # responsive text nodes or accessibility-tree timing quirks.
     @staticmethod
     def tab_pickup(page):
-        return page.get_by_text("Pickup", exact=True)
+        return page.locator("#pickup")
 
     @staticmethod
     def tab_delivery(page):
-        return page.get_by_text("Delivery", exact=True)
+        return page.locator("#delivery")
 
     RADIO_OUTLET_HAYOP     = "role=radio[name='Hayop']"
-    FIELD_DELIVERY_ADDRESS = "role=textbox[name='Enter a street name or postal']"
+
+    # Changed from exact match to contains match: the field's real accessible
+    # name is "Enter a street name or postal code" (previous string was
+    # missing the trailing word "code", so exact matching never found it).
+    FIELD_DELIVERY_ADDRESS = "role=textbox[name*='street name or postal']"
+
     BTN_DIALOG_CANCEL      = "role=button[name='Cancel']"
     BTN_DIALOG_CONFIRM     = "role=button[name='Confirm']"
 
@@ -48,10 +53,10 @@ class OrderOnlineLocators:
     HEADING_YOUR_CART = "role=heading[name='Your cart']"
 
     # --- Account Menu ---
-    # TODO: get_by_role("img").nth(1) now opens the CART dialog, not the
-    # account menu (DOM order changed). Use Inspect Element / "Pick locator"
-    # on the actual account/login icon and replace BTN_ACCOUNT_MENU below.
-    BTN_ACCOUNT_MENU  = "ROLE_OR_TESTID_TBD"
+    # The account icon is a plain <div> (no button/link role, no alt text) —
+    # an SVG person-silhouette wrapped in a rounded div. Confirmed via debug
+    # test: clicking it reveals "Sign up" / "Log in" menu items.
+    BTN_ACCOUNT_MENU  = "div.rounded-full.bg-header"
     MENU_ITEM_SIGNUP  = "role=menuitem[name='Sign up']"
     MENU_ITEM_LOGIN   = "role=menuitem[name='Log in']"
 

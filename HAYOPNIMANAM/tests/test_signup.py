@@ -38,6 +38,15 @@ def _fill_full_form_and_reach_otp(page: Page):
     SL.phone_input(page).fill("+63 912 345 6789")
     page.locator(SL.BTN_SIGN_UP).click()
 
+    # DEBUG: capture what actually happens right after phone submit.
+    # If the OTP tests keep failing at setup, this will show whether the
+    # server returned a rate-limit / error message instead of the expected
+    # email form or OTP modal. Safe to remove once confirmed either way.
+    page.wait_for_timeout(2000)
+    page.screenshot(path="debug_otp_flow.png", full_page=True)
+    print("\n--- Body text after phone submit (debug) ---")
+    print(page.locator("body").inner_text()[:1000])
+
     # Check which state the server lands on (email form vs OTP modal directly)
     otp_already_visible = False
     try:
@@ -184,6 +193,11 @@ class TestTermsAndPrivacyLinks:
     Privacy policy uses href assertion instead of expect_popup() because
     browsers commonly block a second consecutive programmatic popup from
     the same page after one has already been opened (security measure).
+
+    Terms of service uses a URL-pattern check instead of
+    popup.wait_for_load_state() because some external destinations are
+    slow/flaky to fully load (ads, trackers) — we only need to confirm the
+    popup opened to a real external URL, same approach as test_press.py.
     """
 
     @pytest.fixture(autouse=True)
@@ -194,8 +208,8 @@ class TestTermsAndPrivacyLinks:
         with page.expect_popup() as popup_info:
             page.get_by_role("link", name="terms of service").click()
         popup = popup_info.value
-        popup.wait_for_load_state()
-        assert popup.url != ""
+        # Don't wait for full load — avoid hangs on slow external pages.
+        expect(popup).to_have_url(re.compile(r"^https?://"), timeout=10000)
         popup.close()
 
     def test_privacy_policy_link_has_correct_href(self, page: Page):

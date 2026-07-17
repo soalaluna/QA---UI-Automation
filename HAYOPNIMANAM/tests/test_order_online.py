@@ -8,6 +8,7 @@ from locators.order_online_locators import OrderOnlineLocators as OL
 @pytest.fixture(autouse=True)
 def navigate_to_order_online(page: Page):
     page.goto(OL.ORDER_ONLINE_URL, wait_until="domcontentloaded", timeout=60000)
+    page.locator(OL.BTN_DELIVERY_LOCATION).nth(1).wait_for(state="visible", timeout=15000)
     yield
 
 
@@ -81,8 +82,37 @@ class TestDeliveryPickupDialog:
 
     @pytest.fixture(autouse=True)
     def open_location_dialog(self, page: Page):
-        page.locator(OL.BTN_DELIVERY_LOCATION).nth(1).click()
-        OL.tab_pickup(page).wait_for(state="visible", timeout=10000)
+        trigger = page.locator(OL.BTN_DELIVERY_LOCATION).nth(1)
+        trigger.wait_for(state="visible", timeout=15000)
+
+        # Retry the click if the dialog doesn't show up in time. This has
+        # been intermittent (~2 of 9 tests, different one each run) rather
+        # than a broken locator — most likely cause is the click occasionally
+        # not registering (a fade-in overlay intercepting it, or the trigger
+        # not yet interactive). Retrying the click is cheaper and more
+        # targeted than just raising the timeout further, which only masks
+        # the issue without addressing it.
+        dialog = page.locator("role=dialog").first
+        last_error = None
+        for attempt in range(3):
+            trigger.click()
+            try:
+                dialog.wait_for(state="visible", timeout=8000)
+                last_error = None
+                break
+            except Exception as e:
+                last_error = e
+        if last_error is not None:
+            raise last_error
+
+        # Let any async content inside the dialog settle before checking tabs
+        try:
+            page.wait_for_load_state("networkidle", timeout=5000)
+        except Exception:
+            pass  # networkidle can timeout on sites with polling/analytics — non-fatal
+
+        # Then wait for the tab to be ready (ID-based, more stable than text match)
+        OL.tab_pickup(page).wait_for(state="visible", timeout=15000)
 
     def test_pickup_tab_visible(self, page: Page):
         expect(OL.tab_pickup(page)).to_be_visible()

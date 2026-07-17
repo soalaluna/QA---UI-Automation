@@ -54,6 +54,37 @@ def test_press_link_opens_in_new_tab(
     popup.close()
 
 
+# ── Debug ──────────────────────────────────────────────────────────────────
+# Investigates why test_press_link_opens_in_new_tab[chromium-read more-1]
+# fails while all other parametrized cases pass. Theory: multiple <a> tags
+# on page 1 contain "read more" in their text (has_text does substring/
+# descendant matching), so link(...).first may not be grabbing the intended
+# featured "read more" link. Safe to delete once root cause is confirmed
+# and the real fix is applied to PressPage.link() or PRESS_LINKS.
+
+def test_debug_read_more_matches(press_page: PressPage) -> None:
+    matches = press_page.page.locator("a").filter(has_text="read more").all()
+    print(f"\n--- Found {len(matches)} <a> matching 'read more' on page 1 ---")
+    for i, m in enumerate(matches):
+        try:
+            href = m.get_attribute("href")
+            target = m.get_attribute("target")
+            text = m.inner_text()[:60]
+            visible = m.is_visible()
+            print(f"[{i}] href={href!r} target={target!r} visible={visible} text={text!r}")
+        except Exception as e:
+            print(f"[{i}] error: {e}")
+
+    # Compare against the dedicated read_more_link property, which uses an
+    # exact role-based match instead of substring has_text
+    print("\n--- press_page.read_more_link (exact role match) ---")
+    try:
+        rml = press_page.read_more_link
+        print(f"href={rml.get_attribute('href')!r} target={rml.get_attribute('target')!r}")
+    except Exception as e:
+        print(f"error: {e}")
+
+
 # ── Footer Tests ──────────────────────────────────────────────────────────────
 
 def test_footer_instagram_link_present(press_page: PressPage) -> None:
