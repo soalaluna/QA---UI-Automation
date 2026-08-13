@@ -7,20 +7,14 @@ from locators.privacy_policy_locators import PrivacyPolicyLocators as PL
 
 @pytest.fixture(autouse=True)
 def navigate_to_privacy_page(page: Page):
-    # Try to navigate up to 3 times before failing
-    max_retries = 3
-    for i in range(max_retries):
-        try:
-            page.goto(PL.URL, wait_until="domcontentloaded", timeout=60000)
-            break # Success! Exit the loop
-        except Exception as e:
-            if i == max_retries - 1:
-                raise e # This was the last try, propagate the error
-            page.wait_for_timeout(3000) # Wait 3 seconds before retrying
-
-    # Cookie banner dismissal
+    # Try to navigate with a longer wait
+    page.goto(PL.URL, wait_until="networkidle", timeout=60000)
+    
+    # Increase the timeout for the cookie banner
     try:
-        page.locator("role=button[name='Accept All Cookies']").click(timeout=3000)
+        page.locator("role=button[name='Accept All Cookies']").click(timeout=10000)
+        # Wait for the banner to animate away
+        page.wait_for_timeout(1000) 
     except Exception:
         pass 
         

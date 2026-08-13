@@ -40,27 +40,14 @@ def test_press_link_opens_in_new_tab(
     """Clicking a press link opens the source article in a new tab."""
     press_page.goto_pagination_page(page_number)
     link = press_page.link(link_name).first
-    # Let any card fade-up/scroll animation settle before clicking,
-    # to avoid "element is not stable" timeouts on some cards.
     link.scroll_into_view_if_needed()
     press_page.page.wait_for_timeout(500)
     with press_page.page.expect_popup() as popup_info:
         link.click(force=True)
     popup = popup_info.value
-    # Don't wait for full load — some external news sites (ads/trackers) are
-    # too slow or flaky to reliably finish loading. We only care that the
-    # popup opened with a valid external URL.
     expect(popup).to_have_url(re.compile(r"^https?://"), timeout=10000)
     popup.close()
 
-
-# ── Debug ──────────────────────────────────────────────────────────────────
-# Investigates why test_press_link_opens_in_new_tab[chromium-read more-1]
-# fails while all other parametrized cases pass. Theory: multiple <a> tags
-# on page 1 contain "read more" in their text (has_text does substring/
-# descendant matching), so link(...).first may not be grabbing the intended
-# featured "read more" link. Safe to delete once root cause is confirmed
-# and the real fix is applied to PressPage.link() or PRESS_LINKS.
 
 def test_debug_read_more_matches(press_page: PressPage) -> None:
     matches = press_page.page.locator("a").filter(has_text="read more").all()
@@ -75,8 +62,6 @@ def test_debug_read_more_matches(press_page: PressPage) -> None:
         except Exception as e:
             print(f"[{i}] error: {e}")
 
-    # Compare against the dedicated read_more_link property, which uses an
-    # exact role-based match instead of substring has_text
     print("\n--- press_page.read_more_link (exact role match) ---")
     try:
         rml = press_page.read_more_link

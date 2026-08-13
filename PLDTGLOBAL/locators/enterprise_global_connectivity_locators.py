@@ -3,9 +3,9 @@ class PLDTConnectivityLocators:
     URL = "https://www.pldtglobal.com/en/enterprise/pgc-global-connectivity"
 
     # --- Breadcrumbs ---
-    LINK_ENTERPRISE    = "role=link[name=/^Enterprise$/]"
+    # Using *= (contains) so it matches both "Enterprise" and "Enterprise Solutions"
+    LINK_ENTERPRISE    = "role=link[name*='Enterprise']"
     TEXT_BREADCRUMB    = "span:has-text('Global Connectivity')"
-    ICON_CHEVRON       = ".lucide.lucide-chevron-right"
 
     # --- Hero & Intro Section ---
     HEADING_MAIN       = "role=heading[name='Global Connectivity']"

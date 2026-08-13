@@ -1,7 +1,6 @@
 
 import re
 
-
 class LoginLocators:
 
     LOGIN_URL = "https://hayop.atlas.kitchen/login"

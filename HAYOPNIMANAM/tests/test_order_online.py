@@ -85,13 +85,6 @@ class TestDeliveryPickupDialog:
         trigger = page.locator(OL.BTN_DELIVERY_LOCATION).nth(1)
         trigger.wait_for(state="visible", timeout=15000)
 
-        # Retry the click if the dialog doesn't show up in time. This has
-        # been intermittent (~2 of 9 tests, different one each run) rather
-        # than a broken locator — most likely cause is the click occasionally
-        # not registering (a fade-in overlay intercepting it, or the trigger
-        # not yet interactive). Retrying the click is cheaper and more
-        # targeted than just raising the timeout further, which only masks
-        # the issue without addressing it.
         dialog = page.locator("role=dialog").first
         last_error = None
         for attempt in range(3):
@@ -141,8 +134,6 @@ class TestDeliveryPickupDialog:
         field = page.locator(OL.FIELD_DELIVERY_ADDRESS)
         field.fill("Singapore")
         field.press("Enter")
-        # TODO: assert on the actual post-submit state (autocomplete list,
-        # enabled confirm button, navigation, etc.) once confirmed.
 
 
 # ── Cart Tests ─────────────────────────────────────────────────────────────────
@@ -153,12 +144,6 @@ class TestCart:
         page.locator(OL.BTN_CART).click()
         expect(page.locator(OL.HEADING_YOUR_CART)).to_be_visible()
         expect(page.get_by_text("Your cart is empty.")).to_be_visible()
-
-
-# ── Account Menu Tests ─────────────────────────────────────────────────────────
-# TODO: BTN_ACCOUNT_MENU is unresolved. get_by_role("img").nth(1) now opens
-# the cart dialog instead of the account menu. Replace the click target below
-# once the real locator is found via Inspect Element / codegen "Pick locator".
 
 class TestAccountMenu:
 

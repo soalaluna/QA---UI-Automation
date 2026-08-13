@@ -186,19 +186,6 @@ class TestSignupFormFill:
 # ── Terms and Privacy Links ───────────────────────────────────────────────────
 
 class TestTermsAndPrivacyLinks:
-    """
-    Terms/privacy links only render inside the detailed signup form (after
-    phone submission). The submit_phone_first fixture makes them visible.
-
-    Privacy policy uses href assertion instead of expect_popup() because
-    browsers commonly block a second consecutive programmatic popup from
-    the same page after one has already been opened (security measure).
-
-    Terms of service uses a URL-pattern check instead of
-    popup.wait_for_load_state() because some external destinations are
-    slow/flaky to fully load (ads, trackers) — we only need to confirm the
-    popup opened to a real external URL, same approach as test_press.py.
-    """
 
     @pytest.fixture(autouse=True)
     def submit_phone_first(self, page: Page):
@@ -213,24 +200,12 @@ class TestTermsAndPrivacyLinks:
         popup.close()
 
     def test_privacy_policy_link_has_correct_href(self, page: Page):
-        """
-        Verify the privacy policy link is visible and points to the Atlas
-        privacy policy URL. Avoids expect_popup() which browsers can block
-        for a second consecutive popup on the same page.
-        """
         link = page.get_by_role("link", name="privacy policy")
         expect(link).to_be_visible()
         href = link.get_attribute("href")
         assert href and "privacy" in href.lower(), (
             f"Privacy policy link href unexpected: {href}"
         )
-
-
-# ── OTP Modal ─────────────────────────────────────────────────────────────────
-# Session-scoped so the form is submitted exactly once.
-# _fill_full_form_and_reach_otp handles both server paths:
-#   1. Email form appears → fill everything → submit → OTP modal
-#   2. Server skips to OTP directly (phone used recently = rate limited)
 
 @pytest.fixture(scope="session")
 def otp_page(browser):
